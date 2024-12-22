@@ -79,7 +79,7 @@ blueprint:
       default: []
       selector:
         action: {}
-  source_url: https://github.com/lenhoy/homeassistant/blob/logic-and-traceability-overhaul/nordpool_simple_blueprint.yaml
+  source_url: https://github.com/KodeZ/hass_stuff/blob/main/blueprints/nordpool_on_off.yaml
 variables:
   grid_area_var: !input grid_area
   hour_rank_var: !input hour_rank
