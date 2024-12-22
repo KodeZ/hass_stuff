@@ -1,0 +1,114 @@
+blueprint:
+  name: Nordpool on/off control
+  description: This blueprints uses the nordpool integration and lets you turn on
+    devices on the chepest hours and make automations based on that information.
+    This is based on https://github.com/lenhoy/homeassistant/blob/logic-and-traceability-overhaul/nordpool_simple_blueprint.yaml
+    Which is based on https://github.com/MikaelUlvesjo/homeassistant/blob/main/nordpool_simple_blueprint.yaml
+  domain: automation
+  input:
+    grid_area:
+      name: Grid area sensor
+      description: This is your grid area sensor
+      selector:
+        entity:
+          domain: sensor
+          integration: nordpool
+          multiple: false
+    start_minute:
+      name: Start minute
+      description: Set the minute in hour to check if the price is low
+      default: 0
+      selector:
+        number:
+          min: 0.0
+          max: 59.0
+          mode: slider
+          step: 1.0
+    hour_rank:
+      name: Hours on
+      description: Set the minimum of hours per day that the devices should be on
+      default: 12
+      selector:
+        number:
+          min: 0.0
+          max: 24.0
+          mode: slider
+          step: 1.0
+    hour_ratio:
+      name: Hour percent
+      description: Max percent between minimum and maximum price of the day to turn
+        on devices
+      default: 50
+      selector:
+        number:
+          min: 0.0
+          max: 100.0
+          mode: slider
+          step: 5.0
+    always_on:
+      name: Always on price
+      description: if the price is below this the device is always on (ignoring Hours
+        on and Hour percent)
+      default: 0.0
+      selector:
+        number:
+          min: -1000.0
+          max: 1000.0
+          mode: slider
+          step: 0.1
+    always_off:
+      name: Always off price
+      description: if the price is above this the device is always off (ignoring Hours
+        on and Hour percent)
+      default: 20
+      selector:
+        number:
+          min: -1000.0
+          max: 1000.0
+          mode: slider
+          step: 0.1
+    turnon:
+      name: TurnOn
+      description: Actions to run to turn on devices
+      default: []
+      selector:
+        action: {}
+    turnoff:
+      name: TurnOff
+      description: Actions to run to turn off devices
+      default: []
+      selector:
+        action: {}
+  source_url: https://github.com/lenhoy/homeassistant/blob/logic-and-traceability-overhaul/nordpool_simple_blueprint.yaml
+variables:
+  grid_area_var: !input grid_area
+  hour_rank_var: !input hour_rank
+  hour_ratio_var: !input hour_ratio
+  always_on_var: !input allways_on
+  always_off_var: !input allways_off
+  start_minute_var: !input start_minute
+  prices: '{{ state_attr(grid_area_var, ''today'') | list }}'
+  h: '{{ now().hour }}'
+  m: '{{ now().minute }}'
+  price: '{{ prices[h] }}'
+  sorted_prices: '{{ prices | sort }}'
+  above_low: '{{ prices[h] - sorted_prices[0] }}'
+  diff: '{{ sorted_prices[23] - sorted_prices[0] }}'
+  ratio: '{{ ( above_low / diff ) * 100 | round }}'
+  rank: '{{ sorted_prices.index(price) + 1 }}'
+  condition_allways_on_price: '{{ price | float <= allways_on_var | float }}'
+  condition_price_ratio: '{{ ratio | int <= hour_ratio_var | int }}'
+  condition_rank_cheapest_hours: '{{ rank | int <= hour_rank_var | int }}'
+  seton: '{{ condition_allways_on_price or condition_price_ratio or condition_rank_cheapest_hours
+    }}'
+  result: '{{ price < allways_off_var and seton }}'
+trigger:
+- platform: time_pattern
+  minutes: !input start_minute
+action:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ result }}'
+    sequence: !input turnon
+  default: !input turnoff
