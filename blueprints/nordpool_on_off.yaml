@@ -84,8 +84,8 @@ variables:
   grid_area_var: !input grid_area
   hour_rank_var: !input hour_rank
   hour_ratio_var: !input hour_ratio
-  always_on_var: !input allways_on
-  always_off_var: !input allways_off
+  always_on_var: !input always_on
+  always_off_var: !input always_off
   start_minute_var: !input start_minute
   prices: '{{ state_attr(grid_area_var, ''today'') | list }}'
   h: '{{ now().hour }}'
@@ -96,12 +96,12 @@ variables:
   diff: '{{ sorted_prices[23] - sorted_prices[0] }}'
   ratio: '{{ ( above_low / diff ) * 100 | round }}'
   rank: '{{ sorted_prices.index(price) + 1 }}'
-  condition_allways_on_price: '{{ price | float <= allways_on_var | float }}'
+  condition_always_on_price: '{{ price | float <= always_on_var | float }}'
   condition_price_ratio: '{{ ratio | int <= hour_ratio_var | int }}'
   condition_rank_cheapest_hours: '{{ rank | int <= hour_rank_var | int }}'
-  seton: '{{ condition_allways_on_price or condition_price_ratio or condition_rank_cheapest_hours
+  seton: '{{ condition_always_on_price or condition_price_ratio or condition_rank_cheapest_hours
     }}'
-  result: '{{ price < allways_off_var and seton }}'
+  result: '{{ price < always_off_var and seton }}'
 trigger:
 - platform: time_pattern
   minutes: !input start_minute
