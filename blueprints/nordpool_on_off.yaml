@@ -124,8 +124,9 @@ action:
     - condition: template
       value_template: '{{ debug_var }}'
     sequence:
-      - service: logger.log
+      - service: persistent_notification.create
         data:
+          title: "Nordpool Debug Info"
           message: >
             Debug Info:
             grid_area_var: {{ grid_area_var }},
