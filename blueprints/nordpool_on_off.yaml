@@ -79,6 +79,12 @@ blueprint:
       default: []
       selector:
         action: {}
+    debug:
+      name: Debug
+      description: Enable debug logging
+      default: false
+      selector:
+        boolean: {}
   source_url: https://github.com/KodeZ/hass_stuff/blob/main/blueprints/nordpool_on_off.yaml
 variables:
   grid_area_var: !input grid_area
@@ -112,3 +118,32 @@ action:
       value_template: '{{ result }}'
     sequence: !input turnon
   default: !input turnoff
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ debug_var }}'
+    sequence:
+      - service: logger.log
+        data:
+          message: >
+            Debug Info:
+            grid_area_var: {{ grid_area_var }},
+            hour_rank_var: {{ hour_rank_var }},
+            hour_ratio_var: {{ hour_ratio_var }},
+            always_on_var: {{ always_on_var }},
+            always_off_var: {{ always_off_var }},
+            start_minute_var: {{ start_minute_var }},
+            prices: {{ prices }},
+            h: {{ h }},
+            m: {{ m }},
+            price: {{ price }},
+            sorted_prices: {{ sorted_prices }},
+            above_low: {{ above_low }},
+            diff: {{ diff }},
+            ratio: {{ ratio }},
+            rank: {{ rank }},
+            condition_always_on_price: {{ condition_always_on_price }},
+            condition_price_ratio: {{ condition_price_ratio }},
+            condition_rank_cheapest_hours: {{ condition_rank_cheapest_hours }},
+            seton: {{ seton }},
+            result: {{ result }}
