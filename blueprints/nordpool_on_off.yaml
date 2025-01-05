@@ -93,6 +93,7 @@ variables:
   always_on_var: !input always_on
   always_off_var: !input always_off
   start_minute_var: !input start_minute
+  debug_var: !input debug
   prices: '{{ state_attr(grid_area_var, ''today'') | list }}'
   h: '{{ now().hour }}'
   m: '{{ now().minute }}'
