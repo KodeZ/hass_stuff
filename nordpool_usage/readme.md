@@ -61,7 +61,7 @@ series:
       });
 ```
 
-## Turn on/off thigns
+## Turn on/off things
 
 Go to Automation->Blueprints and add https://github.com/KodeZ/hass_stuff/blob/main/blueprints/nordpool_on_off.yaml
 
