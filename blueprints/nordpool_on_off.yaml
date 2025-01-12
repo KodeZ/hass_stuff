@@ -16,7 +16,8 @@ blueprint:
           multiple: false
     start_minute:
       name: Start minute
-      description: Set the minute in hour to check if the price is low
+      description: Set the minute in hour to check if the price is low. This
+        would typically be zero, so at the start of each hour.
       default: 0
       selector:
         number:
@@ -26,7 +27,9 @@ blueprint:
           step: 1.0
     hour_rank:
       name: Hours on
-      description: Set the minimum of hours per day that the devices should be on
+      description: Set the minimum of hours per day that the devices should be on.
+        The cheapest hours will be selected, unless the price exceeds the max price,
+        in which case this number might be reduced.
       default: 12
       selector:
         number:
@@ -37,7 +40,9 @@ blueprint:
     hour_ratio:
       name: Hour percent
       description: Max percent between minimum and maximum price of the day to turn
-        on devices
+        on devices. If the minimum price is 100, max is 200, and this setting is 35%,
+        then all hours 135 or less will be on. That can be more hours than the minimum
+        hours set, but not less. Again with the execption of the max price.
       default: 50
       selector:
         number:
@@ -47,7 +52,7 @@ blueprint:
           step: 5.0
     always_on:
       name: Always on price
-      description: if the price is below this the device is always on (ignoring Hours
+      description: If the price is below this the device is always on (ignoring Hours
         on and Hour percent)
       default: 0.0
       selector:
@@ -58,7 +63,7 @@ blueprint:
           step: 0.1
     always_off:
       name: Always off price
-      description: if the price is above this the device is always off (ignoring Hours
+      description: If the price is above this the device is always off (ignoring Hours
         on and Hour percent)
       default: 20
       selector:
@@ -81,7 +86,8 @@ blueprint:
         action: {}
     debug:
       name: Debug
-      description: Enable debug logging
+      description: Enable debug logging. This will create a notification every hour 
+        containing all the variables involved in the decision making and the end results.
       default: false
       selector:
         boolean: {}
